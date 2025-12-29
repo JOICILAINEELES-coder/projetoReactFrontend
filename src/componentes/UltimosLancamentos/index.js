@@ -29,8 +29,8 @@ function UltimosLancamentos() {
   return(
      <UltimosLancamentosContainer>
         <Titulo 
-        cor='#eb9b00'
-        tamanhofonte='36px'
+        $cor='#eb9b00'
+        $tamanhofonte='36px'
         >ÚLTIMOS LANÇAMENTOS</Titulo>
     <NovoslivrosContainer>
        { livros.map(livro => (

@@ -8,11 +8,13 @@ import { postFavorito } from '../../servicos/favoritos'
 
 
 const PesquisaContainer = styled.section`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background-image: transparent;
     color: #fff;
     text-align: center;
     padding: 85px 0;
-    height: 270px;
     width: 100%;
 `
 const Titulo = styled.h2`
@@ -33,9 +35,12 @@ const Resultado = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    gap: 20px;
     cursor: pointer;
-
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    width: 90%;
+    margin-top: 20px;
     p {
         width: 200px;
     }
@@ -49,65 +54,80 @@ const Resultado = styled.div`
     }
 `
 
+const BotaoFavoritar = styled.button`
+    background-color: #002f52;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+`
+
 
 function Pesquisa() {
     const [livrosPesquisados, setLivrosPesquisados] = useState([])
-    const [ livros,setLivros ] = useState([])
+    const [livros, setLivros] = useState([])
 
     useEffect(() => {
-       fetchLivros()
+        fetchLivros()
     }, [])
 
     async function fetchLivros() {
-       const livrosDaAPI = await getLivros()
-       setLivros(livrosDaAPI)
-       console.log(livrosDaAPI)
+        const livrosDaAPI = await getLivros()
+        setLivros(livrosDaAPI)
+        console.log(livrosDaAPI)
 
     }
 
     async function insertFavorito(id) {
-       await postFavorito(id)
-       alert(`Livro ${id} adicionado aos favoritos!`)
+        await postFavorito(id)
+        alert(`Livro ${id} adicionado aos favoritos!`)
     }
 
     return (
-    <PesquisaContainer>
-        <Titulo>Já sabe por onde começar?</Titulo>
-        <Subtitulo>Encontre seu livro em nossa estante.</Subtitulo>
-        <Input
-            placeholder="Escreva sua próxima leitura"
-            onBlur={evento => {
-                const textoDigitado = evento.target.value
-                const resultadoPesquisa = livros.filter( livro => livro.nome.toLowerCase().includes(textoDigitado.toLowerCase()))
-                setLivrosPesquisados(resultadoPesquisa)
-            }}
-        />
-        { livrosPesquisados.map(livro => {
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000'
-            const fallbackImage = `${process.env.PUBLIC_URL || ''}./ima`
+        <PesquisaContainer>
+            <Titulo>Já sabe por onde começar?</Titulo>
+            <Subtitulo>Encontre seu livro em nossa estante.</Subtitulo>
+            <Input
+                id="pesquisa-livro"
+                name="pesquisa-livro"
+                placeholder="Escreva sua próxima leitura"
+                onChange={evento => {
+                    const textoDigitado = evento.target.value
+                    if (!textoDigitado) return setLivrosPesquisados([])
+                    const resultadoPesquisa = livros.filter(livro =>
+                        livro.nome.toLowerCase().includes(textoDigitado.toLowerCase()))
+                    setLivrosPesquisados(resultadoPesquisa)
+                }}
+            />
+            {livrosPesquisados.map(livro => {
+                const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000'
+                const fallbackImage = 'https://via.placeholder.com/150x200?text=Sem+Imagem'
 
-            const imageSrc = livro.src
-            ? (livro.src.startsWith('http') ? livro.src : `${apiUrl}/${livro.src}`)
-            : (livro.imagem ? `${apiUrl}/uploads/${livro.imagem}` : fallbackImage)
-            return (
-              <Resultado key={livro.id || livro.nome}>
-               <p>{livro.nome}</p>
-               <img src={imageSrc} alt={livro.nome} 
-               onError={e => { e.currentTarget.src = fallbackImage }}
-               />
-               <button
-               onClick={evento => {
-               evento.stopPropagation() 
-               insertFavorito(livro.id)
-      }}
-    >
-      Favoritar
-    </button>
-  </Resultado>
- )
-})}
-    </PesquisaContainer>
-  )
+                const imageSrc = livro.src
+                    ? (livro.src.startsWith('http') ? livro.src : `${apiUrl}/${livro.src}`)
+                    : (livro.imagem ? `${apiUrl}/uploads/${livro.imagem}` : fallbackImage);
+                return (
+                    <Resultado key={livro.id || livro.nome}>
+                        <p>{livro.nome}</p>
+                        <img
+                            src={imageSrc}
+                            alt={livro.nome}
+                            onError={e => { e.currentTarget.src = fallbackImage }}
+                        />
+                        <BotaoFavoritar
+                            onClick={evento => {
+                                evento.stopPropagation()
+                                insertFavorito(livro.id)
+                            }}
+                        >
+                            Favoritar
+                        </BotaoFavoritar>
+                    </Resultado>
+                )
+            })}
+        </PesquisaContainer>
+    )
 }
 
 export default Pesquisa

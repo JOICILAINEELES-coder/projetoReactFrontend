@@ -21,8 +21,15 @@ const textoOpcoes = ['CATEGORIAS', 'FAVORITOS', 'MINHA ESTANTE']
 function OpcoesHeader() {
   return (
     <Opcoes>
-      {textoOpcoes.map((texto, index) => (
-       <Link to={`/${texto.toLowerCase()}`}><Opcao key={index}><p>{texto}</p></Opcao></Link>
+      {textoOpcoes.map((texto) => (
+        <Opcao key={texto}>
+          <Link 
+            to={`/${texto.toLowerCase().replace(" ", "")}`} 
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <p>{texto}</p>
+          </Link>
+        </Opcao>
       ))}
     </Opcoes>
   )
